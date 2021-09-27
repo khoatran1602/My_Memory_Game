@@ -24,23 +24,6 @@ class MemoryBoardAdapter(
 ) :
     RecyclerView.Adapter<MemoryBoardAdapter.ViewHolder>() {
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val imageButton =  itemView.findViewById<ImageButton>(R.id.imageButton)
-
-        fun bind(position: Int) {
-            val memoryCard = cards[position]
-            imageButton.setImageResource(if (memoryCard.isFaceUp) memoryCard.identifier
-                else R.drawable.ic_launcher_background)
-            imageButton.alpha = if (memoryCard.isMatched) .4f else 1.0f
-            val colorStateList = if (memoryCard.isMatched) ContextCompat.getColorStateList(context, R.color.color_gray) else null
-            ViewCompat.setBackgroundTintList(imageButton, colorStateList)
-            imageButton.setOnClickListener {
-                Log.i(TAG, "Clicked on position $position")
-                cardClickListener.onCardClicked(position)
-            }
-        }
-    }
-
     companion object {
         private const val MARGIN_SIZE = 10
         private const val TAG = "MemoryBoardAdapter"
@@ -67,4 +50,21 @@ class MemoryBoardAdapter(
     }
 
     override fun getItemCount() = boardSize.numCards
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val imageButton =  itemView.findViewById<ImageButton>(R.id.imageButton)
+
+        fun bind(position: Int) {
+            val memoryCard = cards[position]
+            imageButton.setImageResource(if (memoryCard.isFaceUp) memoryCard.identifier
+            else R.drawable.ic_launcher_background)
+            imageButton.alpha = if (memoryCard.isMatched) .4f else 1.0f
+            val colorStateList = if (memoryCard.isMatched) ContextCompat.getColorStateList(context, R.color.color_gray) else null
+            ViewCompat.setBackgroundTintList(imageButton, colorStateList)
+            imageButton.setOnClickListener {
+                Log.i(TAG, "Clicked on position $position")
+                cardClickListener.onCardClicked(position)
+            }
+        }
+    }
 }

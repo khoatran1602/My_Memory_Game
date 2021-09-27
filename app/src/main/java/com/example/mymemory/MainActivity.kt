@@ -5,14 +5,16 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mymemory.model.BoardSize
-import com.example.mymemory.model.MemoryCard
 import com.example.mymemory.model.MemoryGame
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var clRoot: ConstraintLayout
     private lateinit var memoryGame: MemoryGame
     private lateinit var adapter: MemoryBoardAdapter
     private lateinit var rvBoard: RecyclerView
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         rvBoard = findViewById(R.id.rvBoard)
         tvNumMoves = findViewById(R.id.tvNumMoves)
         tvNumPairs = findViewById(R.id.tvNumPairs)
+        clRoot = findViewById(R.id.clRoot)
 
         memoryGame = MemoryGame(boardSize)
 
@@ -46,7 +49,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateGameWithFlip(position: Int) {
-        memoryGame.flipCard(position)
+        if (memoryGame.haveWonGame()) {
+            Snackbar.make(clRoot, "You already won!", Snackbar.LENGTH_LONG).show()
+            return
+        }
+        if (memoryGame.isCardFaceUp(position)) {
+            Snackbar.make(clRoot, "Invalid move!", Snackbar.LENGTH_SHORT).show()
+            return
+        }
+        if (memoryGame.flipCard(position)) {
+            Log.i(TAG,"Found a match! Number of pairs found: ${memoryGame.numPairsFound}")
+            tvNumPairs.text = "Pairs: ${memoryGame.numPairsFound} / ${boardSize.getNumPairs()}"
+            if (memoryGame.haveWonGame()) {
+                Snackbar.make(clRoot, "You won! Congratulation", Snackbar.LENGTH_LONG).show()
+            }
+        }
+        tvNumMoves.text = "Move: ${memoryGame.getNumMoves()}"
         adapter.notifyDataSetChanged()
     }
 }
